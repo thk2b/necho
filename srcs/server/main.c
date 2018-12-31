@@ -11,7 +11,7 @@
 #include		<sys/socket.h>
 
 #define USAGE	"%s [ port ]-- launch a listening necho server."
-
+#define BUFSIZE	4096
 int	usage(char *name)
 {
 	printf(USAGE, name);
@@ -44,11 +44,32 @@ int	get_args(int ac, char **av, struct s_opts *opts)
 	return (0);
 }
 
-int	necho(int listen_fd)
+int	handle_connection(int fd)
+{
+	char				buf[BUFSIZE] = {0};
+	ssize_t				nread, tread;
+
+	tread = 0;
+	dprintf(2, "INFO:\tstart of transaction\n");
+	do
+	{
+		nread = read(fd, buf, BUFSIZE);
+		tread += nread;
+		write(1, buf, nread);
+	}
+	while (nread > 0);
+	if (nread == -1)
+		return error("read");
+	dprintf(2, "INFO:\tend of transaction [%zd bytes]\n", tread);
+	return (0);
+}
+
+int	necho_server(int listen_fd)
 {
 	struct sockaddr_in	client_addr;
 	socklen_t			client_addrlen;
 	int					conn_fd;
+
 
 	while ((conn_fd = accept(listen_fd, (struct sockaddr*)&client_addr, &client_addrlen)) > 0)
 	{
@@ -56,7 +77,9 @@ int	necho(int listen_fd)
 			"INFO:\taccepted connection with %s:%d\n",
 			inet_ntoa(client_addr.sin_addr), client_addr.sin_port
 		);
+		handle_connection(conn_fd);
 		close(conn_fd);
+		dprintf(2, "INFO:\tclosed connection\n");
 	}
 	return (error("accept"));
 }
@@ -86,5 +109,5 @@ int	main(int ac, char **av)
 		"INFO:\twaiting for connections on %s:%d\n",
 		inet_ntoa(address.sin_addr), opts.port
 	);
-	return (necho(listen_fd));
+	return (necho_server(listen_fd));
 }
