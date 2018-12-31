@@ -9,6 +9,7 @@
 #include		<sys/socket.h>
 
 #define USAGE	"%s [[ port ] addr ] -- connects to a necho server and transmits stdin"
+#define BUFSIZE	4096
 
 int	usage(char *name)
 {
@@ -49,6 +50,26 @@ int	get_args(int ac, char **av, struct s_opts *opts)
 
 }
 
+int necho_client(int fd)
+{
+	char	buf[BUFSIZE] = {0};
+	ssize_t	nread, tread;
+
+	tread = 0;
+	do
+	{
+		nread = read(0, buf, BUFSIZE);
+		tread += nread;
+		if (write(fd, buf, nread) != nread)
+			return error("write");
+	}
+	while (nread > 0);
+	if (nread < 0)
+		return error("read");
+	dprintf(2, "INFO:\tsent %zd bytes\n", tread);
+	return 0;
+}
+
 int	main(int ac, char **av)
 {
 	struct s_opts		opts = {0, 0};
@@ -66,6 +87,8 @@ int	main(int ac, char **av)
 	if (connect(sock_fd, (struct sockaddr*)&address, sizeof(address)) < 0)
 		return error("connect");
 	dprintf(2, "INFO:\tconnected to server at %s:%d\n", opts.addr, opts.port);
+	necho_client(sock_fd);
 	close(sock_fd);
+	dprintf(2, "INFO:\tclosed connection\n");
 	return (0);
 }
