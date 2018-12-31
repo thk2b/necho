@@ -10,7 +10,7 @@
 #include		<netinet/in.h>
 #include		<sys/socket.h>
 
-#define USAGE	"%s [ port ]-- launch a listening necho server."
+#define USAGE	"%s [[ port] ip ] -- launch a listening necho server."
 #define BUFSIZE	4096
 int	usage(char *name)
 {
@@ -26,15 +26,22 @@ int	error(char *msg)
 
 struct s_opts
 {
-	int	port;
+	int		port;
+	char	*ip;
 };
 
 int	get_args(int ac, char **av, struct s_opts *opts)
 {
-	if (ac == 2)
+	if (ac == 3)
 	{
-		if (strcmp(av[1], "--help") == 0)
-			return (1);
+		opts->ip = av[2];
+	}
+	else
+	{
+		opts->ip = "0.0.0.0";
+	}
+	if (ac >= 2)
+	{
 		opts->port = atoi(av[1]);
 	}
 	else
@@ -86,7 +93,7 @@ int	necho_server(int listen_fd)
 
 int	main(int ac, char **av)
 {
-	struct s_opts		opts = {0};
+	struct s_opts		opts = {0, 0};
 	struct sockaddr_in	address;
 	int					listen_fd,
 						reuse_addr;
