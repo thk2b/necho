@@ -7,6 +7,7 @@ The server reads from the client and writes to standard output.
 
 # usage
 
+Build:
 ```
 make
 ```
