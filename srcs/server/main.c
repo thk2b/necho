@@ -4,6 +4,7 @@
 #include		<string.h>
 #include		<errno.h>
 
+#include		<unistd.h>
 #include		<arpa/inet.h>
 #include		<sys/types.h>
 #include		<netinet/in.h>
@@ -43,6 +44,23 @@ int	get_args(int ac, char **av, struct s_opts *opts)
 	return (0);
 }
 
+int	necho(int listen_fd)
+{
+	struct sockaddr_in	client_addr;
+	socklen_t			client_addrlen;
+	int					conn_fd;
+
+	while ((conn_fd = accept(listen_fd, (struct sockaddr*)&client_addr, &client_addrlen)) > 0)
+	{
+		dprintf(2,
+			"INFO:\taccepted connection with %s:%d",
+			inet_ntoa(client_addr.sin_addr), client_addr.sin_port
+		);
+		close(conn_fd);
+	}
+	return (error("accept"));
+}
+
 int	main(int ac, char **av)
 {
 	struct s_opts		opts = {0};
@@ -60,5 +78,9 @@ int	main(int ac, char **av)
 		return error("bind");
 	if (listen(listen_fd, 1024) < 0)
 		return error("listen");
-	dprintf(2, "INFO:\tserver listening on %s:%d\n", inet_ntoa(address.sin_addr), opts.port);
+	dprintf(2,
+		"INFO:\twaiting for connections on %s:%d\n",
+		inet_ntoa(address.sin_addr), opts.port
+	);
+	return (necho(listen_fd));
 }
