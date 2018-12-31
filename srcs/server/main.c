@@ -24,7 +24,7 @@ int	error(char *msg)
 	return errno;
 }
 
-struct	s_opts
+struct s_opts
 {
 	int	port;
 };
@@ -53,7 +53,7 @@ int	necho(int listen_fd)
 	while ((conn_fd = accept(listen_fd, (struct sockaddr*)&client_addr, &client_addrlen)) > 0)
 	{
 		dprintf(2,
-			"INFO:\taccepted connection with %s:%d",
+			"INFO:\taccepted connection with %s:%d\n",
 			inet_ntoa(client_addr.sin_addr), client_addr.sin_port
 		);
 		close(conn_fd);
@@ -65,12 +65,16 @@ int	main(int ac, char **av)
 {
 	struct s_opts		opts = {0};
 	struct sockaddr_in	address;
-	int					listen_fd;
+	int					listen_fd,
+						reuse_addr;
 
 	if (get_args(ac, av, &opts))
 		return usage(av[0]);
 	if ((listen_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		return error("socket");
+	reuse_addr = 1;
+	if ((setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, &reuse_addr, sizeof(int))) < 0)
+		return error("setsockopt");
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = htonl(INADDR_ANY);
 	address.sin_port = htons((int16_t)opts.port);
