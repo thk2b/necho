@@ -24,23 +24,33 @@ int			get_args(int ac, char **av, struct s_server_opts *opts)
 	return (0);
 }
 
+static int	necho_server_child(int conn_fd, struct sockaddr_in *client_addr)
+{
+	ssize_t				bytes;
+	char				header[25] = {0};
+
+	snprintf(header, 24, "%15s:%5d:\t", inet_ntoa(client_addr->sin_addr), client_addr->sin_port);
+	dprintf(2, "%sINFO:\taccepted connection\n", header);
+	bytes = copy(conn_fd, 1, header);
+	close(conn_fd);
+	if (bytes >= 0)
+		dprintf(2, "%sINFO:\tconnection closed after %zd bytes\n", header, bytes);
+	return (bytes != -1);
+}
+
 static int	necho_server(int listen_fd)
 {
 	struct sockaddr_in	client_addr;
 	socklen_t			client_addrlen;
 	int					conn_fd;
-	ssize_t				bytes;
+	pid_t				pid;
 
 	while ((conn_fd = accept(listen_fd, (struct sockaddr*)&client_addr, &client_addrlen)) > 0)
 	{
-		dprintf(2,
-			"INFO:\taccepted connection with %s:%d\n",
-			inet_ntoa(client_addr.sin_addr), client_addr.sin_port
-		);
-		bytes = copy(conn_fd, 1);
-		close(conn_fd);
-		if (bytes >= 0)
-			dprintf(2, "INFO:\tconnection closed after %zd bytes\n", bytes);
+		if ((pid = fork()) == -1)
+			return error(0, "fork");
+		if (pid == 0)
+			_exit(necho_server_child(conn_fd, &client_addr));
 	}
 	return (error(0, "accept"));
 }
