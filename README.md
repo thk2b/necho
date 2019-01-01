@@ -14,10 +14,12 @@ make
 
 Run the server:
 ```
-./server 0.0.0.0 8080
+./server [ port=8080 ]
 ```
 
 Run the client:
 ```
-cat /dev/urandom | head-c 100 | ./client 0.0.0.0 8080
+./client [ port=8080 [ ip=0.0.0.0 ]]
+
+cat /dev/urandom | head -c 100 | ./client 8080 0.0.0.0
 ```
