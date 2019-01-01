@@ -1,15 +1,3 @@
-#include		<stdlib.h>
-#include		<stdint.h>
-#include		<stdio.h>
-#include		<string.h>
-#include		<errno.h>
-
-#include		<unistd.h>
-#include		<arpa/inet.h>
-#include		<sys/types.h>
-#include		<netinet/in.h>
-#include		<sys/socket.h>
-
 #include		<necho.h>
 
 #define USAGE	"%s [ port ] -- launch a listening necho server."
@@ -22,6 +10,13 @@ int			get_args(int ac, char **av, struct s_server_opts *opts)
 	else
 		opts->port = 8080;
 	return (0);
+}
+
+static void	sigchld_handler(int sig)
+{
+	(void)sig;
+	while (waitpid(-1, NULL, WNOHANG) > 0)
+		;
 }
 
 static int	necho_server_child(int conn_fd, struct sockaddr_in *client_addr)
@@ -45,12 +40,17 @@ static int	necho_server(int listen_fd)
 	int					conn_fd;
 	pid_t				pid;
 
+	signal(SIGCHLD, sigchld_handler);
 	while ((conn_fd = accept(listen_fd, (struct sockaddr*)&client_addr, &client_addrlen)) > 0)
 	{
 		if ((pid = fork()) == -1)
 			return error(0, "fork");
 		if (pid == 0)
+		{
+			close(listen_fd);
 			_exit(necho_server_child(conn_fd, &client_addr));
+		}
+		close(conn_fd);
 	}
 	return (error(0, "accept"));
 }
