@@ -1,6 +1,6 @@
 #include <necho.h>
 
-ssize_t	copy(int from, int to, char *header)
+ssize_t	copy(int from, int to, char *header, int append_newline)
 {
 	char	buf[BUFSIZE] = {0};
 	ssize_t	nread, tread;
@@ -17,6 +17,10 @@ ssize_t	copy(int from, int to, char *header)
 			return error(-1, "write");
 	}
 	while (nread > 0);
+	if (append_newline && buf[nread] != '\n')
+		if (write(to, "\n", 1) != 1)
+			return error(-1, "write");
+
 	return tread;
 }
 

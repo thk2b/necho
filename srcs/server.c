@@ -31,7 +31,7 @@ static int	necho_server_child(int conn_fd, struct sockaddr_in *client_addr)
 
 	snprintf(header, 24, "%15s:%5d:\t", inet_ntoa(client_addr->sin_addr), client_addr->sin_port);
 	dprintf(2, "%sINFO:\taccepted connection\n", header);
-	bytes = copy(conn_fd, 1, header);
+	bytes = copy(conn_fd, 1, header, 0);
 	close(conn_fd);
 	if (bytes >= 0)
 		dprintf(2, "%sINFO:\tconnection closed after %zd bytes\n", header, bytes);

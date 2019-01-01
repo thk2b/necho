@@ -34,7 +34,7 @@ int	main(int ac, char **av)
 	if (connect(sock_fd, (struct sockaddr*)&address, sizeof(address)) < 0)
 		return error(errno, "connect");
 	dprintf(2, "INFO:\tconnected to server at %s:%d\n", opts.addr, opts.port);
-	bytes = copy(0, sock_fd, NULL);
+	bytes = copy(0, sock_fd, NULL, 1);
 	if (bytes >= 0)
 		dprintf(2, "INFO:\tsent %zd bytes\n", bytes);
 	close(sock_fd);
