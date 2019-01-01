@@ -1,4 +1,4 @@
-#include <necho.h>
+#include		<necho.h>
 
 #define USAGE	"%s [[ port ] addr ] -- connects to a necho server and transmits stdin"
 

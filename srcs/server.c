@@ -15,7 +15,7 @@
 #define USAGE	"%s [[ port] ip ] -- launch a listening necho server."
 
 
-int	get_args(int ac, char **av, struct s_server_opts *opts)
+int			get_args(int ac, char **av, struct s_server_opts *opts)
 {
 	if (ac >= 2)
 		opts->port = atoi(av[1]);
