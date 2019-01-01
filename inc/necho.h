@@ -35,4 +35,4 @@ struct	s_server_opts
 
 int		usage(char *str, char *name);
 int		error(int ret, char *msg);
-ssize_t	copy(int from, int to, char *header);
+ssize_t	copy(int from, int to, char *header, int append_final_newline);

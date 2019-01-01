@@ -20,7 +20,6 @@ ssize_t	copy(int from, int to, char *header, int append_newline)
 	if (append_newline && buf[nread] != '\n')
 		if (write(to, "\n", 1) != 1)
 			return error(-1, "write");
-
 	return tread;
 }
 
