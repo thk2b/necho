@@ -1,9 +1,9 @@
 # necho
-Network echo
+network-echo: a simple client-server application to put sockets into practice.
 
 The client sends its standard input to the server.
 
-The server reads from the client and writes to standard output.
+The server reads from each client and writes to standard output.
 
 # usage
 
