@@ -1,6 +1,6 @@
 #include		<necho.h>
 
-#define USAGE	"%s [[ port ] addr ] -- connects to a necho server and transmits stdin"
+#define USAGE	"%s [ port [ addr ]] -- connects to a necho server and transmits stdin"
 
 int	get_args(int ac, char **av, struct s_client_opts *opts)
 {

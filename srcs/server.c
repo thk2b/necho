@@ -12,7 +12,7 @@
 
 #include		<necho.h>
 
-#define USAGE	"%s [[ port] ip ] -- launch a listening necho server."
+#define USAGE	"%s [ port ] -- launch a listening necho server."
 
 
 int			get_args(int ac, char **av, struct s_server_opts *opts)
